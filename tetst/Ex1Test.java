@@ -1,4 +1,3 @@
-package assignments.Ex1;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -185,7 +184,7 @@ class Ex1Test {
 		double a3 = Ex1.area(po_a,po_b, x1, x2, 3);
 		double a100 = Ex1.area(po_a,po_b, x1, x2, 100);
 		double area =2.5;
-		assertEquals(a1,area, Ex1.EPS);
+        assertEquals(a1,area, Ex1.EPS);
 		assertEquals(a2,area, Ex1.EPS);
 		assertEquals(a3,area, Ex1.EPS);
 		assertEquals(a100,area, Ex1.EPS);
@@ -202,4 +201,15 @@ class Ex1Test {
 		double area = 58.5658;
 		assertEquals(a1,area, Ex1.EPS);
 	}
+
+    @Test
+    /**
+     * Test the difference function.
+     */
+    public void testDifference() {
+        double[] p1 = {-2,3,-2.5,7.4};
+        double[] z={0.0,0.0,0.0,0.0};
+        double[] d=Ex1.difference(p1,p1);
+        assertTrue(Ex1.equals(d, z));
+    }
 }

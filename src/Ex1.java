@@ -1,4 +1,3 @@
-package assignments.Ex1;
 
 /**
  * Introduction to Computer Science 2026, Ariel University,
@@ -62,10 +61,19 @@ public class Ex1 {
 		int lx = xx.length;
 		int ly = yy.length;
 		if(xx!=null && yy!=null && lx==ly && lx>1 && lx<4) {
-		/** add you code below
+            ans = new double[lx];
 
-		/////////////////// */
-		}
+            double denom = (xx[0] - xx[1]) * (xx[0] - xx[2]) * (xx[1] - xx[2]);
+            double A     = (xx[2] * (yy[1] - yy[0]) + xx[1] * (yy[0] - yy[2]) + xx[0] * (yy[2] - yy[1])) / denom;
+            double B     = (xx[2]*xx[2] * (yy[0] - yy[1]) + xx[1]*xx[1] * (yy[2] - yy[0]) + xx[0]*xx[0] * (yy[1] - yy[2])) / denom;
+            double C     = (xx[1] * xx[2] * (xx[1] - xx[2]) * yy[0] + xx[2] * xx[0] * (xx[2] - xx[0]) * yy[1] + xx[0] * xx[1] * (xx[0] - xx[1]) * yy[2]) / denom;
+
+            for(int i=1;i<lx;i++) {
+                if (i==0){ans[0]=C;}
+                if(i==1){ans[1]=B;}
+                if(i==2){ans[2]=A;}
+            }
+        }
 		return ans;
 	}
 	/** Two polynomials functions are equal if and only if they have the same values f(x) for n+1 values of x,
@@ -76,9 +84,12 @@ public class Ex1 {
 	 */
 	public static boolean equals(double[] p1, double[] p2) {
 		boolean ans = true;
-        /** add you code below
+            for(int i=0;i<=Math.max(p1.length,p2.length);i++) {
+                double x1=f(p1,i);
+                double x2=f(p2,i);
+                if(Math.abs(x1-x2)>EPS) {ans=false;}
+            }
 
-         /////////////////// */
 		return ans;
 	}
 
@@ -92,9 +103,33 @@ public class Ex1 {
 		String ans = "";
 		if(poly.length==0) {ans="0";}
 		else {
-            /** add you code below
-
-             /////////////////// */
+            for(int i=poly.length-1; i>=0; i--) {
+                if(poly[i]!=0) {
+                    if(i>1) {
+                        if (poly[i] > 0) {
+                            ans = ans+" +" + poly[i] + "x^" + i;
+                        }
+                        if (poly[i] <0){
+                            ans = ans +" "+ poly[i] + "x^" + i;
+                        }
+                    }
+                    if(i==1){
+                        if (poly[i] > 0) {
+                            ans = ans+" +" + poly[i] + "x ";
+                        }
+                        if (poly[i] <0){
+                            ans = ans +" "+ poly[i] + "x ";
+                        }
+                    }
+                    if(i==0) {
+                        if (poly[i] > 0) {
+                            ans = ans+" +" + poly[i] ;
+                        }
+                        if (poly[i] <0){
+                            ans = ans +" "+ poly[i] ;
+                        }                    }
+                }
+            }
 		}
 		return ans;
 	}
@@ -110,9 +145,11 @@ public class Ex1 {
 	 */
 	public static double sameValue(double[] p1, double[] p2, double x1, double x2, double eps) {
 		double ans = x1;
-        /** add you code below
 
-         /////////////////// */
+        double[] difference = difference(p1, p2);
+
+        ans= root_rec(difference,x1,x2,eps);
+
 		return ans;
 	}
 	/**
@@ -128,10 +165,23 @@ public class Ex1 {
 	 * @return the length approximation of the function between f(x1) and f(x2).
 	 */
 	public static double length(double[] p, double x1, double x2, int numberOfSegments) {
-		double ans = x1;
-        /** add you code below
+		double ans = 0;
 
-         /////////////////// */
+        double step = Math.abs(x1-x2)/numberOfSegments;
+
+        for(double i=x1;i<x2;i=i+step) {
+            double j = i+step;
+            double y1=f(p,i);
+            double y2=f(p,j);
+
+            double lengthX = Math.pow ((i-j),2);
+            double lengthy = Math.pow ((y1-y2),2);
+
+            double length=Math.sqrt(lengthX+lengthy);
+
+            ans = ans+length;
+        }
+
 		return ans;
 	}
 	
@@ -148,10 +198,39 @@ public class Ex1 {
 	 */
 	public static double area(double[] p1,double[]p2, double x1, double x2, int numberOfTrapezoid) {
 		double ans = 0;
-        /** add you code below
 
-         /////////////////// */
-		return ans;
+        if(numberOfTrapezoid<2) {
+            numberOfTrapezoid=2;
+        }
+
+        double step = Math.abs(x1-x2)/numberOfTrapezoid;
+
+        for(double i=x1;i<x2;i=i+step) {
+
+            double j = i+step;
+
+            if(f(p1,i)>f(p2,i) && f(p1,j)<f(p2,j) || f(p1,i)<f(p2,i) && f(p1,j)>f(p2,j)) {
+                double same = sameValue(p1,p2,i,j,EPS);
+
+                double height1 = Math.abs(f(p1,i)-f(p2,i));
+                double width1 = same-i;
+
+                ans += (height1 * width1) /2;
+
+                double height2 = Math.abs(f(p1,j)-f(p2,j));
+                double width2 = j-same;
+
+                ans+=(height2*width2)/2;
+
+            }else {
+                double height1 = Math.abs(f(p1, i) - f(p2, i));
+                double height2 = Math.abs(f(p1, j) - f(p2, j));
+
+                ans += (height1 + height2) / 2 * step;
+            }
+        }
+
+        return ans;
 	}
 	/**
 	 * This function computes the array representation of a polynomial function from a String
@@ -163,11 +242,50 @@ public class Ex1 {
 	 */
 	public static double[] getPolynomFromString(String p) {
 		double [] ans = ZERO;//  -1.0x^2 +3.0x +2.0
-        /** add you code below
 
-         /////////////////// */
-		return ans;
+        String regex = "[ ]";
+        String[] poly = p.split(regex);
+
+        int count=0;
+
+        for(int i=0;i<poly.length;i++) {
+            if(poly[i]!="") {
+                count++;
+            }
+        }
+
+        ans=new double[count];
+
+        count=0;
+
+        for(int i=0;i<poly.length;i++) {
+            if(poly[i]!="") {
+                String[] split = poly[i].split("x");
+                if (split[0].charAt(0) == '+') {
+                    String a = split[0].substring(1);
+                    double x = Double.parseDouble(a);
+                    ans[ans.length - count-1] = x;
+                }
+
+                if (split[0].charAt(0) == '-') {
+                    String a = split[0].substring(1);
+                    double x = Double.parseDouble(a) * (-1);
+                    ans[ans.length - count-1] = x;
+                }
+
+                if (split[0].charAt(0) != '-' && split[0].charAt(0) != '+') {
+                    String a = split[0];
+                    double x = Double.parseDouble(a) ;
+                    ans[ans.length - count-1] = x;
+                }
+
+                count++;
+            }
+        }
+
+            return ans;
 	}
+
 	/**
 	 * This function computes the polynomial function which is the sum of two polynomial functions (p1,p2)
 	 * @param p1
@@ -175,10 +293,19 @@ public class Ex1 {
 	 * @return
 	 */
 	public static double[] add(double[] p1, double[] p2) {
-		double [] ans = ZERO;//
-        /** add you code below
-
-         /////////////////// */
+		double [] ans = ZERO;
+        ans=new double [Math.max(p1.length,p2.length)];
+        for (int i=0;i<ans.length;i++) {
+            if(i<p1.length&&i<p2.length) {
+                ans[i] = p1[i] + p2[i];
+            }
+            if(i>=p1.length) {
+                ans[i] = p2[i];
+            }
+            if(i>=p2.length) {
+                ans[i] = p1[i];
+            }
+        }
 		return ans;
 	}
 	/**
@@ -188,11 +315,20 @@ public class Ex1 {
 	 * @return
 	 */
 	public static double[] mul(double[] p1, double[] p2) {
-		double [] ans = ZERO;//
-        /** add you code below
+		double [] ans = ZERO;
 
-         /////////////////// */
-		return ans;
+        if(p1.length!=0&&p2.length!=0) {
+            ans=new double [p1.length+p2.length];
+
+            for (int i=0;i<p1.length;i++) {
+                for(int j=0;j<p2.length;j++) {
+                    ans[i+j] = ans[i+j] + p1[i]*p2[j];
+                }
+
+            }
+        }
+
+        return ans;
 	}
 	/**
 	 * This function computes the derivative of the p0 polynomial function.
@@ -200,10 +336,24 @@ public class Ex1 {
 	 * @return
 	 */
 	public static double[] derivative (double[] po) {
-		double [] ans = ZERO;//
-        /** add you code below
-
-         /////////////////// */
+		double [] ans = ZERO;
+        if(po.length!=0) {ans=new double [po.length-1];}
+        for(int i=1;i<po.length;i++) {
+            ans[i-1]=po[i]*i;
+        }
 		return ans;
 	}
+
+
+    public static double[] difference(double[]p1, double[] p2) {
+        double[] inverse= new double[p2.length];
+        System.arraycopy(p2, 0, inverse, 0, p2.length);
+
+        for(int i=0;i<inverse.length;i++) {
+            inverse[i] = (-1) * p2[i];
+        }
+
+        double[] ans = add(p1,inverse);
+        return ans;
+    }
 }

@@ -1,4 +1,3 @@
-package assignments.Ex1;
 //import assignments.Ex1.sol.Ex1_Sol;
 
 /**
