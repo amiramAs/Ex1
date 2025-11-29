@@ -88,6 +88,8 @@ class Ex1Test {
 		double[] p21 = Ex1.mul(po2, po1);
 		assertTrue(Ex1.equals(p12, p21));
 	}
+
+
 	@Test
 	/**
 	 * Tests that p1(x) * p2(x) = (p1*p2)(x),
@@ -118,11 +120,12 @@ class Ex1Test {
 		assertTrue(Ex1.equals(Ex1.ZERO, dp3));
 		assertTrue(Ex1.equals(dp4, dp3));
 	}
+
 	@Test
 	/** 
 	 * Tests the parsing of a polynom in a String like form.
 	 */
-	public void testFromString() {
+	public void testFromString1() {
 		double[] p = {-1.1,2.3,3.1}; // 3.1X^2+ 2.3x -1.1
 		String sp2 = "3.1x^2 +2.3x -1.1";
 		String sp = Ex1.poly(p);
@@ -134,6 +137,24 @@ class Ex1Test {
 		if(!isSame2) {fail();}
 		assertEquals(sp, Ex1.poly(p1));
 	}
+
+    @Test
+    /**
+     * Tests the parsing of a polynom in a String like form.
+     */
+    public void testFromString2() {
+        double[] p = {-2}; // -2
+        String sp2 = "-2";
+        String sp = Ex1.poly(p);
+        double[] p1 = Ex1.getPolynomFromString(sp);
+        double[] p2 = Ex1.getPolynomFromString(sp2);
+        boolean isSame1 = Ex1.equals(p1, p);
+        boolean isSame2 = Ex1.equals(p2, p);
+        if(!isSame1) {fail();}
+        if(!isSame2) {fail();}
+        assertEquals(sp, Ex1.poly(p1));
+    }
+
 	@Test
 	/**
 	 * Tests the equality of pairs of arrays.
@@ -150,16 +171,29 @@ class Ex1Test {
 		}
 	}
 
+    @Test
+    /**
+     * Tests is the sameValue function is symmetric.
+     */
+    public void testSameValue1() {
+        double x1=-4, x2=0;
+        double rs1 = Ex1.sameValue(po1,po2, x1, x2, Ex1.EPS);
+        double rs2 = Ex1.sameValue(po2,po1, x1, x2, Ex1.EPS);
+        assertEquals(rs1,rs2, Ex1.EPS);
+    }
+
 	@Test
 	/**
-	 * Tests is the sameValue function is symmetric.
+	 * Tests the sameValue function.
 	 */
 	public void testSameValue2() {
-		double x1=-4, x2=0;
-		double rs1 = Ex1.sameValue(po1,po2, x1, x2, Ex1.EPS);
-		double rs2 = Ex1.sameValue(po2,po1, x1, x2, Ex1.EPS);
-		assertEquals(rs1,rs2, Ex1.EPS);
+		double x1=-4, x2=0,x3=4;
+		double rs1 = Ex1.sameValue(po3,po4, x1, x2, Ex1.EPS);
+        double rs2 = Ex1.sameValue(po3,po4, x2, x3, Ex1.EPS);
+		assertEquals(rs1,-2.34469, Ex1.EPS);
+        assertEquals(rs2,2.7482, Ex1.EPS);
 	}
+
 	@Test
 	/**
 	 * Test the area function - it should be symmetric.
@@ -204,12 +238,74 @@ class Ex1Test {
 
     @Test
     /**
-     * Test the difference function.
+     * Test is the difference po2-po3 + difference po3-po2 = 0
      */
-    public void testDifference() {
-        double[] p1 = {-2,3,-2.5,7.4};
-        double[] z={0.0,0.0,0.0,0.0};
-        double[] d=Ex1.difference(p1,p1);
-        assertTrue(Ex1.equals(d, z));
+    public void testDifference1() {
+        double[] d1=Ex1.difference(po2,po3);
+        double[] d2=Ex1.difference(po3,po2);
+        double[] d3=Ex1.add(d1,d2);
+        assertTrue(Ex1.equals(d3, new double[]{0, 0, 0, 0, 0}));
+    }
+
+    @Test
+    /**
+     * Test is the difference po-0 = po
+     */
+    public void testDifference2() {
+        double[] d1=Ex1.difference(po2,Ex1.ZERO);
+        assertTrue(Ex1.equals(d1, po2));
+    }
+
+    @Test
+    /**
+     * Test of PolynomFromPoints function
+     */
+    public void testPolynomFromPoints1() {
+    double[] xx2={0,2.6374,-5.6874};
+    double[] yy2={-3,0,0};
+    double[] p2 = Ex1.PolynomFromPoints(xx2, yy2);
+    assertTrue(Ex1.equals(p2, po2));
+    }
+
+    @Test
+    /**
+     * Test of PolynomFromPoints function
+     */
+    public void testPolynomFromPoints2() {
+        double[] xx1={-1,0};
+        double[] yy1={0,2};
+        double[] p1 = Ex1.PolynomFromPoints(xx1, yy1);
+        assertTrue(Ex1.equals(p1, po1));
+    }
+
+    @Test
+    /**
+     * Test of length function
+     */
+    public void testLength1() {
+        double[] po_a = {2,1,-0.7, -0.02,0.02};
+        double l1 = Ex1.length(po_a, 0, 4, 8);
+        double length = 5.8796;
+        assertEquals(l1,length, Ex1.EPS);
+    }
+
+    @Test
+    /**
+     * Test is length function return 0 if range = 0
+     */
+    public void testLength2() {
+        double l1 = Ex1.length(po2, 0, 0, 8);
+        double length = 0;
+        assertEquals(l1,length, Ex1.EPS);
+    }
+
+    @Test
+    /**
+     * Test is length function return 0 if number Of Segments = 0
+     */
+    public void testLength3() {
+        double l1 = Ex1.length(po1, 0, 4, 0);
+        double length = 0;
+        assertEquals(l1,length, Ex1.EPS);
     }
 }
